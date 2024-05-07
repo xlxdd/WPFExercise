@@ -1,0 +1,85 @@
+﻿<UserControl x:Class="student.Views.SelectView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:local="clr-namespace:student.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <TextBlock Margin="5"
+                   TextAlignment="Center"
+                   Text="选课信息"
+                   FontSize="28" />
+        <TextBlock Margin="5"
+                   TextAlignment="Center"
+                   Grid.Column="1"
+                   Text="录入选课信息"
+                   FontSize="28" />
+        <DataGrid Background="LightBlue"
+                  Margin="10"
+                  Grid.Row="1"
+                  x:Name="dataGrid"
+                  CanUserAddRows="False"
+                  AutoGenerateColumns="False"
+                  ItemsSource="{Binding SelectDtos}"
+                  SelectionMode="Extended"
+                  SelectionUnit="Cell">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding SelectDtos.StudentName}"
+                                    Header="姓名" />
+                <DataGridTextColumn Binding="{Binding SelectDtos.StudentNumber}"
+                                    Header="学号" />
+                <DataGridTextColumn Binding="{Binding SelectDtos.CourseName}"
+                                    Header="课程名称" />
+                <DataGridTextColumn Binding="{Binding SelectDtos.CourseCode}"
+                                    Header="课程代码" />
+                <DataGridTemplateColumn Header="操作">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center">
+                                <Button Content="删除"
+                                        Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource MaterialDesignOutlinedLightButton}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel Background="LightGray"
+                    Margin="10"
+                    Grid.Row="1"
+                    Grid.Column="1">
+            <ComboBox ItemsSource="{Binding Courses}"
+                      SelectedValuePath="CourseId"
+                      SelectedValue="{Binding SelectedCourseId}"
+                      materialDesign:HintAssist.Hint="选择课程">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding CourseName}" />
+                            <TextBlock Text=" - " />
+                            <TextBlock Text="{Binding CourseCode}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <Button Command="{Binding AddCommand}"
+                    Margin="10 5"
+                    Content="提交" />
+        </StackPanel>
+    </Grid>
+</UserControl>
