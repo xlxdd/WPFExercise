@@ -10,14 +10,14 @@ namespace EntityFramework.Models
         public int? StudentId
         {
             get { return studentId; }
-            set { studentId = value;OnPropertyChanged(); }
+            set { studentId = value; OnPropertyChanged(); }
         }
         private int? courseId;
 
         public int? CourseId
         {
             get { return courseId; }
-            set { courseId = value;OnPropertyChanged(); }
+            set { courseId = value; OnPropertyChanged(); }
         }
         public DateTime SelectDate { get; set; }
     }

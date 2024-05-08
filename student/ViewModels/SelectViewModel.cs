@@ -12,12 +12,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace student.ViewModels;
 
-public class SelectViewModel: NavigationViewModel
+public class SelectViewModel : NavigationViewModel
 {
     private readonly IDialogHostService dialogHost;
     public SelectViewModel(IContainerProvider provider) : base(provider)
@@ -26,17 +24,17 @@ public class SelectViewModel: NavigationViewModel
         AddCommand = new DelegateCommand(AddSelect);
         dialogHost = provider.Resolve<IDialogHostService>();
     }
-    private Student? selectedStudent;    
+    private Student? selectedStudent;
     public Student? SelectedStudent
     {
         get { return selectedStudent; }
-        set { selectedStudent = value;RaisePropertyChanged(); }
+        set { selectedStudent = value; RaisePropertyChanged(); }
     }
     private int? selectedCourseId;
     public int? SelectedCourseId
     {
         get { return selectedCourseId; }
-        set { selectedCourseId = value;RaisePropertyChanged(); }
+        set { selectedCourseId = value; RaisePropertyChanged(); }
     }
     private ObservableCollection<Student> students;
     public ObservableCollection<Student> Students
@@ -45,7 +43,8 @@ public class SelectViewModel: NavigationViewModel
         set { students = value; RaisePropertyChanged(); }
     }
     private ObservableCollection<Course> courses;
-    public ObservableCollection<Course> Courses {
+    public ObservableCollection<Course> Courses
+    {
         get { return courses; }
         set { courses = value; RaisePropertyChanged(); }
     }
@@ -82,7 +81,7 @@ public class SelectViewModel: NavigationViewModel
                 ).ToListAsync();
             SelectDtos = new ObservableCollection<SelectDto>(sels);
         }
-        finally { UpdateLoading(false);}
+        finally { UpdateLoading(false); }
     }
     private async void DeleteSelectAsync(SelectDto sel)
     {
@@ -92,7 +91,7 @@ public class SelectViewModel: NavigationViewModel
             if (res.Result != ButtonResult.OK) return;
             UpdateLoading(true);
             using var context = new stu_infoContext();
-            var sell = context.Selects.FirstOrDefault(s=>s.SelectId == sel.Sel.SelectId);
+            var sell = context.Selects.FirstOrDefault(s => s.SelectId == sel.Sel.SelectId);
             if (sell != null)
             {
                 sell.IsDeleted = !sell.IsDeleted;
@@ -108,7 +107,7 @@ public class SelectViewModel: NavigationViewModel
     }
     private async void AddSelect()
     {
-        if(selectedStudent == null||selectedCourseId == null)
+        if (SelectedStudent == null || SelectedCourseId == null)
         {
             SendMessage("请选中");
             return;
@@ -117,9 +116,9 @@ public class SelectViewModel: NavigationViewModel
         {
             UpdateLoading(true);
             using var context = new stu_infoContext();
-            var exist =await context.Selects.AsNoTracking().AnyAsync(s=>s.StudentId == selectedStudent.StudentId && s.CourseId == selectedCourseId&&s.IsDeleted == false);
+            var exist = await context.Selects.AsNoTracking().AnyAsync(s => s.StudentId == SelectedStudent.StudentId && s.CourseId == SelectedCourseId && s.IsDeleted == false);
             if (exist) throw new Exception();
-            context.Selects.Add(new Select {StudentId = selectedStudent.StudentId,CourseId = selectedCourseId,SelectDate = DateTime.Today,IsDeleted  =false });
+            context.Selects.Add(new Select { StudentId = SelectedStudent.StudentId, CourseId = SelectedCourseId, SelectDate = DateTime.Today, IsDeleted = false });
             context.SaveChanges();
             SendMessage("操作成功！");
             InitData();

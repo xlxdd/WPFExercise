@@ -1,19 +1,18 @@
 ﻿using data;
 using EntityFramework.Models;
+using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Ioc;
 using Prism.Regions;
 using Prism.Services.Dialogs;
 using student.Common;
-using System.Collections.ObjectModel;
-using Microsoft.EntityFrameworkCore;
 using student.Extensions;
+using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows.Input;
 
 namespace student.ViewModels;
 
-public class CourseViewModel: NavigationViewModel
+public class CourseViewModel : NavigationViewModel
 {
     private readonly IDialogHostService dialogHost;
     public CourseViewModel(IContainerProvider provider) : base(provider)
@@ -79,7 +78,7 @@ public class CourseViewModel: NavigationViewModel
     }
     private async void UpdateCourseAsync(Course course)
     {
-        if(string.IsNullOrWhiteSpace(course.CourseName)||course.CourseCode == null || string.IsNullOrWhiteSpace(course.Teacher))
+        if (string.IsNullOrWhiteSpace(course.CourseName) || course.CourseCode == null || string.IsNullOrWhiteSpace(course.Teacher))
         {
             SendMessage("非法输入");
             return;

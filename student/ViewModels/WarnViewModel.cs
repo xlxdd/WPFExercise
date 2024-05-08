@@ -3,15 +3,10 @@ using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using student.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace student.ViewModels;
 
-public class WarnViewModel:BindableBase, IDialogHostAware
+public class WarnViewModel : BindableBase, IDialogHostAware
 {
     public WarnViewModel()
     {

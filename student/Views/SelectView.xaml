@@ -26,6 +26,7 @@
                    Text="录入选课信息"
                    FontSize="28" />
         <DataGrid Background="LightBlue"
+                  IsReadOnly="True"
                   Margin="10"
                   Grid.Row="1"
                   x:Name="dataGrid"
@@ -43,6 +44,8 @@
                                     Header="课程名称" />
                 <DataGridTextColumn Binding="{Binding CourseCode}"
                                     Header="课程代码" />
+                <DataGridTextColumn Binding="{Binding Sel.SelectDate, StringFormat=d}"
+                                    Header="选课日期" />
                 <DataGridTemplateColumn Header="操作">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>

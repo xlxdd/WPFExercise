@@ -80,8 +80,8 @@ class StudentViewModel : NavigationViewModel
     }
     private async void UpdateStudentAsync(Student student)
     {
-        if(String.IsNullOrWhiteSpace(student.Name)||student.StudentNumber == null||student.AdmissionDate == null)
-        {          
+        if (String.IsNullOrWhiteSpace(student.Name) || student.StudentNumber == null || student.AdmissionDate == null)
+        {
             SendMessage("非法输入");
             return;
         }
