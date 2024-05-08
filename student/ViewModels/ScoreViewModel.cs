@@ -22,6 +22,7 @@ public class ScoreViewModel : NavigationViewModel
         AddCommand = new DelegateCommand(AddGrade);
         UpdateCommand = new DelegateCommand<GradeDto>(UpdateGradeAsync);
         DeleteCommand = new DelegateCommand<GradeDto>(DeleteGradeAsync);
+        SearchCommand = new DelegateCommand(SearchAsync);
         dialogHost = provider.Resolve<IDialogHostService>();
     }
     #region bindings
@@ -189,6 +190,37 @@ public class ScoreViewModel : NavigationViewModel
             context.Grades.Update(gra.Gra);
             context.SaveChanges();
             SendMessage("操作成功！");
+        }
+        finally
+        {
+            UpdateLoading(false);
+        }
+    }
+    private async void SearchAsync()
+    {
+        try
+        {
+            UpdateLoading(true);
+            using var context = new stu_infoContext();
+            var query = context.Grades.AsNoTracking().Where(g => g.IsDeleted == false)
+                    .Join(context.Courses,
+                        grade => grade.CourseId, // 选课关系表的课程ID
+                        course => course.CourseId, // 课程表的课程ID
+                        (grade, course) => new { Grade = grade, CoureCode = course.CourseCode, CourseName = course.CourseName } // 结果选择器
+                    )
+                    .Join(context.Students,
+                        sc => sc.Grade.StudentId, // 上一步结果的学生ID
+                        student => student.StudentId, // 学生表的学生ID
+                        (sc, student) => new GradeDto { Gra = sc.Grade, StudentNumber = student.StudentNumber, StudentName = student.Name, CourseCode = sc.CoureCode, CourseName = sc.CourseName } // 结果选择器
+                    );
+            if (!string.IsNullOrWhiteSpace(SearchText)) query = query.Where(g => (g.StudentName == SearchText || g.StudentNumber.ToString() == SearchText));
+            if (SelectedCourseId != null) query = query.Where(g => g.Gra.CourseId == SelectedCourseId);
+            var res = await query.ToListAsync();
+            GradeDtos.Clear();
+            foreach (var grade in res)
+            {
+                GradeDtos.Add(grade);
+            }
         }
         finally
         {
