@@ -47,4 +47,12 @@ public static class DialogExtension
     {
         aggregator.GetEvent<UpdateLoadingEvent>().Subscribe(model);
     }
+    public static void RegisterMessage(this IEventAggregator aggregator, Action<string> action)
+    {
+        aggregator.GetEvent<MessageEvent>().Subscribe(action);
+    }
+    public static void SendMessage(this IEventAggregator aggregator, string message)
+    {
+        aggregator.GetEvent<MessageEvent>().Publish(message);
+    }
 }

@@ -29,9 +29,9 @@ namespace EntityFramework.Models
         /// <summary>
         /// 入学日期
         /// </summary>
-        private DateTime adminssionDate;
+        private DateTime? adminssionDate;
 
-        public DateTime AdmissionDate
+        public DateTime? AdmissionDate
         {
             get { return adminssionDate; }
             set { adminssionDate = value; OnPropertyChanged(); }

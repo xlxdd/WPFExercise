@@ -58,9 +58,15 @@
                     </ListBox>
                 </DockPanel>
             </materialDesign:DrawerHost.LeftDrawerContent>
-
-            <DockPanel>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <materialDesign:Snackbar Panel.ZIndex="1" x:Name="SnackBar"
+                                         MessageQueue="{materialDesign:MessageQueue}" />
                 <materialDesign:ColorZone Padding="16"
+                                          CornerRadius="15 15 0 0"
                                           x:Name="ColorZone"
                                           materialDesign:ElevationAssist.Elevation="Dp4"
                                           DockPanel.Dock="Top"
@@ -111,8 +117,10 @@
                         </StackPanel>
                     </DockPanel>
                 </materialDesign:ColorZone>
-                <ContentControl prism:RegionManager.RegionName="{x:Static ext:PrismRegionNames.MainViewRegionName}" />
-            </DockPanel>
+                <ContentControl Background="Transparent" Panel.ZIndex="1" Grid.Row="1" prism:RegionManager.RegionName="{x:Static ext:PrismRegionNames.MainViewRegionName}" />
+                <Border Background="White"
+                        CornerRadius="0 0 15 15" Grid.Row="1" />
+            </Grid>
         </materialDesign:DrawerHost>
     </materialDesign:DialogHost>
 </Window>

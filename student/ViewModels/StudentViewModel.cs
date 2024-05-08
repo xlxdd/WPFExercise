@@ -45,12 +45,15 @@ class StudentViewModel : NavigationViewModel
     public DelegateCommand AddCommand { get; private set; }
     private async void InitData()
     {
-        UpdateLoading(true);
-        NewStudent.StudentId = null;
-        using var context = new stu_infoContext();
-        var stus = await context.Students.AsNoTracking().Where(s=>s.IsDeleted==false).ToListAsync();
-        Students = new ObservableCollection<Student>(stus);
-        UpdateLoading(false);
+        try
+        {
+            UpdateLoading(true);
+            NewStudent.StudentId = null;
+            using var context = new stu_infoContext();
+            var stus = await context.Students.AsNoTracking().Where(s => s.IsDeleted == false).ToListAsync();
+            Students = new ObservableCollection<Student>(stus);
+        }
+        finally { UpdateLoading(false); }
     }
     private async void DeleteStudentAsync(Student student)
     {
@@ -67,6 +70,7 @@ class StudentViewModel : NavigationViewModel
                 student.IsDeleted = stu.IsDeleted;
                 context.SaveChanges();
             }
+            SendMessage("操作成功！");
         }
         finally
         {
@@ -76,6 +80,11 @@ class StudentViewModel : NavigationViewModel
     }
     private async void UpdateStudentAsync(Student student)
     {
+        if(String.IsNullOrWhiteSpace(student.Name)||student.StudentNumber == null||student.AdmissionDate == null)
+        {          
+            SendMessage("非法输入");
+            return;
+        }
         try
         {
             var res = await dialogHost.Question("温馨提示", $"确认更新学生{student.Name}的信息?");
@@ -84,6 +93,7 @@ class StudentViewModel : NavigationViewModel
             using var context = new stu_infoContext();
             context.Students.Update(student);
             context.SaveChanges();
+            SendMessage("操作成功！");
         }
         finally
         {
@@ -94,11 +104,16 @@ class StudentViewModel : NavigationViewModel
     {
         try
         {
+            if (String.IsNullOrWhiteSpace(NewStudent.Name) || NewStudent.StudentNumber == null || NewStudent.AdmissionDate == null)
+            {
+                SendMessage("非法输入");
+                return;
+            }
             UpdateLoading(true);
             using var context = new stu_infoContext();
             context.Students.Add(NewStudent);
             context.SaveChanges();
-            InitData();
+            SendMessage("操作成功！");
         }
         catch
         {
@@ -109,6 +124,7 @@ class StudentViewModel : NavigationViewModel
         {
             UpdateLoading(false);
         }
+        InitData();
     }
     public override void OnNavigatedTo(NavigationContext navigationContext)
     {

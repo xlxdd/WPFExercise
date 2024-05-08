@@ -55,7 +55,7 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <StackPanel Background="LightGray" Margin="10" Grid.Row="1"
+        <StackPanel Background="Transparent" Panel.ZIndex="1" Margin="10" Grid.Row="1"
                     Grid.Column="1">
             <TextBox Text="{Binding NewStudent.Name}"  VerticalAlignment="Center"
                      materialDesign:HintAssist.Hint="姓名"
@@ -69,5 +69,10 @@
                         Style="{StaticResource MaterialDesignFloatingHintDatePicker}" />
             <Button Command="{Binding AddCommand}" Margin="10 5" Content="提交" />
         </StackPanel>
+        <Border Grid.Column="1"
+                Grid.Row="1"
+                CornerRadius="4"
+                Background="LightGray"
+                Margin="8" />
     </Grid>
 </UserControl>

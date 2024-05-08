@@ -22,25 +22,21 @@ public class SelectViewModel: NavigationViewModel
     private readonly IDialogHostService dialogHost;
     public SelectViewModel(IContainerProvider provider) : base(provider)
     {
-        NewSelect = new Select();
         DeleteCommand = new DelegateCommand<SelectDto>(DeleteSelectAsync);
         AddCommand = new DelegateCommand(AddSelect);
         dialogHost = provider.Resolve<IDialogHostService>();
     }
+    private Student? selectedStudent;    
+    public Student? SelectedStudent
+    {
+        get { return selectedStudent; }
+        set { selectedStudent = value;RaisePropertyChanged(); }
+    }
     private int? selectedCourseId;
-
     public int? SelectedCourseId
     {
         get { return selectedCourseId; }
         set { selectedCourseId = value;RaisePropertyChanged(); }
-    }
-
-    private Select newSelect;
-
-    public Select NewSelect
-    {
-        get { return newSelect; }
-        set { newSelect = value; RaisePropertyChanged(); }
     }
     private ObservableCollection<Student> students;
     public ObservableCollection<Student> Students
@@ -65,24 +61,28 @@ public class SelectViewModel: NavigationViewModel
     public DelegateCommand AddCommand { get; private set; }
     private async void InitData()
     {
-        UpdateLoading(true);
-        NewSelect.SelectId = null;
-        using var context = new stu_infoContext();
-        Students = new ObservableCollection<Student>(await context.Students.AsNoTracking().Where(s=>s.IsDeleted == false).ToListAsync());
-        Courses = new ObservableCollection<Course>(await context.Courses.AsNoTracking().Where(c => c.IsDeleted == false).ToListAsync());
-        var sels = await context.Selects.AsNoTracking().Where(s => s.IsDeleted == false)
-            .Join(context.Courses,
-                select => select.CourseId, // 选课关系表的课程ID
-                course => course.CourseId, // 课程表的课程ID
-                (select, course) => new { Select = select, CoureCode = course.CourseCode,CourseName = course.CourseName } // 结果选择器
-            )
-            .Join(context.Students,
-                sc => sc.Select.StudentId, // 上一步结果的学生ID
-                student => student.StudentId, // 学生表的学生ID
-                (sc, student) => new SelectDto { Sel = sc.Select,StudentNumber = student.StudentNumber,StudentName = student.Name,CourseCode = sc.CoureCode,CourseName = sc.CourseName} // 结果选择器
-            ).ToListAsync();
-        SelectDtos = new ObservableCollection<SelectDto>(sels);
-        UpdateLoading(false);
+        try
+        {
+            UpdateLoading(true);
+            SelectedCourseId = null;
+            SelectedStudent = null;
+            using var context = new stu_infoContext();
+            Students = new ObservableCollection<Student>(await context.Students.AsNoTracking().Where(s => s.IsDeleted == false).ToListAsync());
+            Courses = new ObservableCollection<Course>(await context.Courses.AsNoTracking().Where(c => c.IsDeleted == false).ToListAsync());
+            var sels = await context.Selects.AsNoTracking().Where(s => s.IsDeleted == false)
+                .Join(context.Courses,
+                    select => select.CourseId, // 选课关系表的课程ID
+                    course => course.CourseId, // 课程表的课程ID
+                    (select, course) => new { Select = select, CoureCode = course.CourseCode, CourseName = course.CourseName } // 结果选择器
+                )
+                .Join(context.Students,
+                    sc => sc.Select.StudentId, // 上一步结果的学生ID
+                    student => student.StudentId, // 学生表的学生ID
+                    (sc, student) => new SelectDto { Sel = sc.Select, StudentNumber = student.StudentNumber, StudentName = student.Name, CourseCode = sc.CoureCode, CourseName = sc.CourseName } // 结果选择器
+                ).ToListAsync();
+            SelectDtos = new ObservableCollection<SelectDto>(sels);
+        }
+        finally { UpdateLoading(false);}
     }
     private async void DeleteSelectAsync(SelectDto sel)
     {
@@ -96,9 +96,9 @@ public class SelectViewModel: NavigationViewModel
             if (sell != null)
             {
                 sell.IsDeleted = !sell.IsDeleted;
-                //sel.IsDeleted = sell.IsDeleted;
                 context.SaveChanges();
             }
+            SendMessage("操作成功！");
         }
         finally
         {
@@ -108,12 +108,20 @@ public class SelectViewModel: NavigationViewModel
     }
     private async void AddSelect()
     {
+        if(selectedStudent == null||selectedCourseId == null)
+        {
+            SendMessage("请选中");
+            return;
+        }
         try
         {
             UpdateLoading(true);
             using var context = new stu_infoContext();
-            context.Selects.Add(NewSelect);
+            var exist =await context.Selects.AsNoTracking().AnyAsync(s=>s.StudentId == selectedStudent.StudentId && s.CourseId == selectedCourseId&&s.IsDeleted == false);
+            if (exist) throw new Exception();
+            context.Selects.Add(new Select {StudentId = selectedStudent.StudentId,CourseId = selectedCourseId,SelectDate = DateTime.Today,IsDeleted  =false });
             context.SaveChanges();
+            SendMessage("操作成功！");
             InitData();
         }
         catch

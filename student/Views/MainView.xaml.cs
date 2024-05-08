@@ -13,6 +13,12 @@ namespace student.Views
         public MainView(IEventAggregator aggregator)
         {
             InitializeComponent();
+            //注册提示消息
+            aggregator.RegisterMessage(arg =>
+            {
+                SnackBar.MessageQueue.Enqueue(arg);
+            });
+
             //注册等待消息窗口
             aggregator.Register(a =>
             {

@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using Microsoft.EntityFrameworkCore;
 using student.Extensions;
 using System.Linq;
+using System.Windows.Input;
 
 namespace student.ViewModels;
 
@@ -44,12 +45,15 @@ public class CourseViewModel: NavigationViewModel
     public DelegateCommand AddCommand { get; private set; }
     private async void InitData()
     {
-        UpdateLoading(true);
-        NewCourse.CourseId = null;
-        using var context = new stu_infoContext();
-        var cous = await context.Courses.AsNoTracking().Where(c=>c.IsDeleted==false).ToListAsync();
-        Courses = new ObservableCollection<Course>(cous);
-        UpdateLoading(false);
+        try
+        {
+            UpdateLoading(true);
+            NewCourse.CourseId = null;
+            using var context = new stu_infoContext();
+            var cous = await context.Courses.AsNoTracking().Where(c => c.IsDeleted == false).ToListAsync();
+            Courses = new ObservableCollection<Course>(cous);
+        }
+        finally { UpdateLoading(false); }
     }
     private async void DeleteCourseAsync(Course course)
     {
@@ -63,9 +67,9 @@ public class CourseViewModel: NavigationViewModel
             if (cou != null)
             {
                 cou.IsDeleted = !cou.IsDeleted;
-                course.IsDeleted = cou.IsDeleted;
                 context.SaveChanges();
             }
+            SendMessage("操作成功！");
         }
         finally
         {
@@ -75,6 +79,11 @@ public class CourseViewModel: NavigationViewModel
     }
     private async void UpdateCourseAsync(Course course)
     {
+        if(string.IsNullOrWhiteSpace(course.CourseName)||course.CourseCode == null || string.IsNullOrWhiteSpace(course.Teacher))
+        {
+            SendMessage("非法输入");
+            return;
+        }
         try
         {
             var res = await dialogHost.Question("温馨提示", $"确认更新课程{course.CourseName}的信息?");
@@ -83,6 +92,7 @@ public class CourseViewModel: NavigationViewModel
             using var context = new stu_infoContext();
             context.Courses.Update(course);
             context.SaveChanges();
+            SendMessage("操作成功！");
         }
         finally
         {
@@ -91,13 +101,18 @@ public class CourseViewModel: NavigationViewModel
     }
     private async void AddCourse()
     {
+        if (string.IsNullOrWhiteSpace(NewCourse.CourseName) || NewCourse.CourseCode == null || string.IsNullOrWhiteSpace(NewCourse.Teacher))
+        {
+            SendMessage("非法输入");
+            return;
+        }
         try
         {
             UpdateLoading(true);
             using var context = new stu_infoContext();
             context.Courses.Add(NewCourse);
             context.SaveChanges();
-            InitData();
+            SendMessage("操作成功");
         }
         catch
         {
@@ -108,6 +123,7 @@ public class CourseViewModel: NavigationViewModel
         {
             UpdateLoading(false);
         }
+        InitData();
     }
     public override void OnNavigatedTo(NavigationContext navigationContext)
     {

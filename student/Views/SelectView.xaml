@@ -35,13 +35,13 @@
                   SelectionMode="Extended"
                   SelectionUnit="Cell">
             <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding SelectDtos.StudentName}"
+                <DataGridTextColumn Binding="{Binding StudentName}"
                                     Header="姓名" />
-                <DataGridTextColumn Binding="{Binding SelectDtos.StudentNumber}"
+                <DataGridTextColumn Binding="{Binding StudentNumber}"
                                     Header="学号" />
-                <DataGridTextColumn Binding="{Binding SelectDtos.CourseName}"
+                <DataGridTextColumn Binding="{Binding CourseName}"
                                     Header="课程名称" />
-                <DataGridTextColumn Binding="{Binding SelectDtos.CourseCode}"
+                <DataGridTextColumn Binding="{Binding CourseCode}"
                                     Header="课程代码" />
                 <DataGridTemplateColumn Header="操作">
                     <DataGridTemplateColumn.CellTemplate>
@@ -59,11 +59,31 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <StackPanel Background="LightGray"
+        <Grid Background="Transparent"
                     Margin="10"
                     Grid.Row="1"
-                    Grid.Column="1">
-            <ComboBox ItemsSource="{Binding Courses}"
+                    Grid.Column="1" Panel.ZIndex="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="3*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <Border BorderBrush="Gray"
+                    BorderThickness="1" CornerRadius="3"/>
+            <ListBox SelectionMode="Single"
+                     ItemsSource="{Binding Students}"
+                     SelectedItem="{Binding SelectedStudent}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding StudentNumber}" />
+                            <TextBlock Text=" - " />
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <ComboBox Grid.Row="1" ItemsSource="{Binding Courses}"
                       SelectedValuePath="CourseId"
                       SelectedValue="{Binding SelectedCourseId}"
                       materialDesign:HintAssist.Hint="选择课程">
@@ -77,9 +97,14 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            <Button Command="{Binding AddCommand}"
+            <Button Grid.Row="2" Command="{Binding AddCommand}"
                     Margin="10 5"
                     Content="提交" />
-        </StackPanel>
+        </Grid>
+        <Border Grid.Column="1"
+                Grid.Row="1"
+                CornerRadius="4"
+                Background="LightGray" 
+                Margin="8"/>
     </Grid>
 </UserControl>
