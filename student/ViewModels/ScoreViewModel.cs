@@ -234,7 +234,7 @@ public class ScoreViewModel : NavigationViewModel
     private async void StudentSum()
     {
         int studentNum;
-        if (!int.TryParse(SearchText, out studentNum)) { SendMessage("输入合法的学号"); return; }
+        if (string.IsNullOrWhiteSpace(SearchText) || !int.TryParse(SearchText, out studentNum)) { SendMessage("输入合法的学号"); return; }
         try
         {
             var context = new stu_infoContext();
@@ -249,7 +249,7 @@ public class ScoreViewModel : NavigationViewModel
                         sc => sc.Grade.StudentId, // 上一步结果的学生ID
                         student => student.StudentId, // 学生表的学生ID
                         (sc, student) => new GradeDto { Gra = sc.Grade, StudentNumber = student.StudentNumber, StudentName = student.Name, CourseCode = sc.CoureCode, CourseName = sc.CourseName } // 结果选择器
-                    ).Where(d=>d.StudentNumber == studentNum).ToListAsync();
+                    ).Where(d => d.StudentNumber == studentNum).ToListAsync();
             var count = res.Count;
             if (count == 0) { SendMessage("该学生没有成绩信息"); return; }
             await dialogHost.Summar(res, 1);

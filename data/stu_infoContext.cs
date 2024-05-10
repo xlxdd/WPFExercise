@@ -1,4 +1,5 @@
-﻿using EntityFramework.Models;
+﻿using data.Models;
+using EntityFramework.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace data
@@ -10,6 +11,7 @@ namespace data
         public DbSet<Grade> Grades { get; set; }
         public DbSet<Select> Selects { get; set; }
         public DbSet<Student> Students { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder opt)
         {

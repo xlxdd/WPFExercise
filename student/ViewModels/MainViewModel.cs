@@ -10,6 +10,14 @@ namespace student.ViewModels;
 
 class MainViewModel : BindableBase, IConfigureService
 {
+    private string userName;
+
+    public string UserName
+    {
+        get { return userName; }
+        set { userName = value; RaisePropertyChanged(); }
+    }
+
     private readonly IRegionManager _regionManager;
     private IRegionNavigationJournal _journal;
     public MainViewModel(IRegionManager regionManager)
@@ -58,6 +66,7 @@ class MainViewModel : BindableBase, IConfigureService
     public void Configure()
     {
         CreateMenu();
+        UserName = AppSessions.UserName;
         _regionManager.Regions[PrismRegionNames.MainViewRegionName].RequestNavigate("StudentView");
     }
 }
