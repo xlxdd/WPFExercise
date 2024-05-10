@@ -1,8 +1,10 @@
-﻿using Prism.Events;
+﻿using data.Models;
+using Prism.Events;
 using Prism.Services.Dialogs;
 using student.Common;
 using student.Events;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace student.Extensions;
@@ -38,6 +40,18 @@ public static class DialogExtension
         param.Add("dialogHostName", dialogHostName);
         var dialogResult = await dialogHost.ShowDialog("WarnView", param, dialogHostName);
         return dialogResult;
+    }
+    public static async Task<IDialogResult> Summar(this IDialogHostService dialogHost,
+        List<GradeDto> grades,
+        byte summaryType,
+        string dialogHostName = "Root"
+        )
+    {
+        DialogParameters param = new DialogParameters();
+        param.Add("Grades", grades);
+        param.Add("SummaryType", summaryType);
+        param.Add("dialogHostName", dialogHostName);
+        return await dialogHost.ShowDialog("SummaryView", param, dialogHostName);
     }
     public static void UpdateLoading(this IEventAggregator aggregator, UpdateModel model)
     {

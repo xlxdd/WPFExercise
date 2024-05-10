@@ -2,7 +2,9 @@
 using Prism.Ioc;
 using student.Common;
 using student.ViewModels;
+using student.ViewModels.Dialogs;
 using student.Views;
+using student.Views.Dialogs;
 using System.Windows;
 
 namespace student;
@@ -36,5 +38,6 @@ public partial class App : PrismApplication
         containerRegistry.RegisterForNavigation<SettingsView, SettingsViewModel>();
         containerRegistry.RegisterForNavigation<MsgView, MsgViewModel>();
         containerRegistry.RegisterForNavigation<WarnView, WarnViewModel>();
+        containerRegistry.RegisterForNavigation<SummaryView, SummaryViewModel>();
     }
 }

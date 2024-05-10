@@ -1,0 +1,110 @@
+﻿<UserControl x:Class="student.Views.Dialogs.SummaryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             xmlns:local="clr-namespace:student.Views.Dialogs"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="600">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+        <ScrollViewer Name="ScoreSum" HorizontalScrollBarVisibility="Auto">
+            <StackPanel>
+                <TextBlock Text="统计信息" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0">
+                        <Run Text="名称：" />
+                        <Run Text="{Binding Name}" />
+                    </TextBlock>
+                    <TextBlock Grid.Column="1">
+                        <Run Text="数量：" />
+                        <Run Text="{Binding Sum}" />
+                    </TextBlock>
+                    <TextBlock Grid.Column="2">
+                        <Run Text="最高分：" />
+                        <Run Text="{Binding Max}" />
+                    </TextBlock>
+                    <TextBlock Grid.Column="3">
+                        <Run Text="最低分：" />
+                        <Run Text="{Binding Min}" />
+                    </TextBlock>
+                    <TextBlock Grid.Column="4">
+                        <Run Text="平均分：" />
+                        <Run Text="{Binding Avg}" />
+                    </TextBlock>
+                </Grid>
+                <lvc:PieChart Height="200"
+                              LegendLocation="Bottom"
+                              Hoverable="False"
+                              DataTooltip="{x:Null}">
+                    <lvc:PieChart.Series>
+                        <lvc:PieSeries Title="0-60"
+                                       Values="{Binding Fail}"
+                                       DataLabels="True"
+                                       LabelPoint="{Binding PointLabel}" />
+                        <lvc:PieSeries Title="60-90"
+                                       Values="{Binding Pass}"
+                                       DataLabels="True"
+                                       LabelPoint="{Binding PointLabel}" />
+                        <lvc:PieSeries Title="90-100"
+                                       Values="{Binding Excellent}"
+                                       DataLabels="True"
+                                       LabelPoint="{Binding PointLabel}" />
+                    </lvc:PieChart.Series>
+                </lvc:PieChart>
+                <DataGrid AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          CanUserResizeColumns="False"
+                          CanUserResizeRows="False"
+                          CanUserSortColumns="False"
+                          ItemsSource="{Binding Model}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Binding="{Binding StudentName}"
+                                            IsReadOnly="True"
+                                            Header="姓名" />
+                        <DataGridTextColumn Binding="{Binding StudentNumber}"
+                                            IsReadOnly="True"
+                                            Header="学号" />
+                        <DataGridTextColumn Binding="{Binding CourseName}"
+                                            IsReadOnly="True"
+                                            Header="课程名称" />
+                        <DataGridTextColumn Binding="{Binding CourseCode}"
+                                            IsReadOnly="True"
+                                            Header="课程代码" />
+                        <DataGridTextColumn Binding="{Binding Gra.Score,Converter={StaticResource StringToNullableDecimalConverter}}"
+                                            IsReadOnly="False"
+                                            Header="成绩" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </ScrollViewer>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Button Margin="10" 
+                    Grid.Column="0"
+                    Content="打印"
+                    Click="Button_Click"/>
+            <Button Margin="10"
+                    Grid.Column="4"
+                    Content="取消"
+                    Command="{Binding CancelCommand}" />
+        </Grid>
+    </Grid>
+</UserControl>

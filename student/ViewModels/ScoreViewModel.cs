@@ -23,6 +23,8 @@ public class ScoreViewModel : NavigationViewModel
         UpdateCommand = new DelegateCommand<GradeDto>(UpdateGradeAsync);
         DeleteCommand = new DelegateCommand<GradeDto>(DeleteGradeAsync);
         SearchCommand = new DelegateCommand(SearchAsync);
+        StudentSummary = new DelegateCommand(StudentSum);
+        CourseSummary = new DelegateCommand(CourseSum);
         dialogHost = provider.Resolve<IDialogHostService>();
     }
     #region bindings
@@ -83,6 +85,8 @@ public class ScoreViewModel : NavigationViewModel
     public DelegateCommand<GradeDto> UpdateCommand { get; private set; }
     public DelegateCommand AddCommand { get; private set; }
     public DelegateCommand SearchCommand { get; private set; }
+    public DelegateCommand StudentSummary { get; private set; }
+    public DelegateCommand CourseSummary { get; private set; }
     #endregion
     #region functions
     private async void InitData()
@@ -226,6 +230,55 @@ public class ScoreViewModel : NavigationViewModel
         {
             UpdateLoading(false);
         }
+    }
+    private async void StudentSum()
+    {
+        int studentNum;
+        if (!int.TryParse(SearchText, out studentNum)) { SendMessage("输入合法的学号"); return; }
+        try
+        {
+            var context = new stu_infoContext();
+            //获取到该学生的全部成绩信息
+            var res = await context.Grades.AsNoTracking().Where(g => g.IsDeleted == false)
+                .Join(context.Courses,
+                        grade => grade.CourseId, // 选课关系表的课程ID
+                        course => course.CourseId, // 课程表的课程ID
+                        (grade, course) => new { Grade = grade, CoureCode = course.CourseCode, CourseName = course.CourseName } // 结果选择器
+                    )
+                    .Join(context.Students,
+                        sc => sc.Grade.StudentId, // 上一步结果的学生ID
+                        student => student.StudentId, // 学生表的学生ID
+                        (sc, student) => new GradeDto { Gra = sc.Grade, StudentNumber = student.StudentNumber, StudentName = student.Name, CourseCode = sc.CoureCode, CourseName = sc.CourseName } // 结果选择器
+                    ).Where(d=>d.StudentNumber == studentNum).ToListAsync();
+            var count = res.Count;
+            if (count == 0) { SendMessage("该学生没有成绩信息"); return; }
+            await dialogHost.Summar(res, 1);
+        }
+        finally { }
+    }
+    private async void CourseSum()
+    {
+        if (SelectedCourseId == null) { SendMessage("请选择课程"); return; }
+        try
+        {
+            var context = new stu_infoContext();
+            //获取到该课程的全部成绩信息
+            var res = await context.Grades.AsNoTracking().Where(g => (g.IsDeleted == false && g.CourseId == selectedCourseId))
+                .Join(context.Courses,
+                        grade => grade.CourseId, // 选课关系表的课程ID
+                        course => course.CourseId, // 课程表的课程ID
+                        (grade, course) => new { Grade = grade, CoureCode = course.CourseCode, CourseName = course.CourseName } // 结果选择器
+                    )
+                    .Join(context.Students,
+                        sc => sc.Grade.StudentId, // 上一步结果的学生ID
+                        student => student.StudentId, // 学生表的学生ID
+                        (sc, student) => new GradeDto { Gra = sc.Grade, StudentNumber = student.StudentNumber, StudentName = student.Name, CourseCode = sc.CoureCode, CourseName = sc.CourseName } // 结果选择器
+                    ).ToListAsync();
+            var count = res.Count;
+            if (count == 0) { SendMessage("该课程没有成绩信息"); return; }
+            await dialogHost.Summar(res, 0);
+        }
+        finally { }
     }
     public override void OnNavigatedTo(NavigationContext navigationContext)
     {
